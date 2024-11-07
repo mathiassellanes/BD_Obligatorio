@@ -1,9 +1,9 @@
 import express from 'express';
 
-import activityRouter from './src/routes/activity.js';
-import instructorRouter from './src/routes/instructor.js';
+import activityRouter from './routes/activity.js';
+import instructorRouter from './routes/instructor.js';
 
-import connection from './src/db/index.js';
+import connection from './db/connection.js';
 
 const app = express();
 

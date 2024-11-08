@@ -12,13 +12,10 @@ const getLoginUser = async (mail) => {
 }
 
 const login = async (mail, password) => {
-  console.log(mail);
   const [result] = await connection.promise().query(
     'SELECT * FROM `Login` WHERE `correo` = ?',
     [mail]
   );
-
-  console.log(result);
 
   if (result.length === 0) {
     return null;

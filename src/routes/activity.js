@@ -6,7 +6,6 @@ import passport from "../middlewares/passport.js";
 const router = Router();
 
 router.get('/',
-  passport.authenticate('jwt', { session: false }),
   async (req, res) => {
   const [result] = await connection.promise().query(
     'SELECT * FROM `Actividades`'

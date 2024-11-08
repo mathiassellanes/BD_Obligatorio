@@ -2,6 +2,10 @@ import express from 'express';
 
 import activityRouter from './routes/activity.js';
 import instructorRouter from './routes/instructor.js';
+import classRouter from './routes/class.js';
+import turnRouter from './routes/turn.js';
+import studentRouter from './routes/student.js';
+
 
 import connection from './db/connection.js';
 
@@ -11,39 +15,9 @@ connection.connect();
 
 app.use('/activity',activityRouter);
 app.get('/instructor', instructorRouter);
-
-app.get('/turns', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Turnos`'
-  );
-
-  res.json(result);
-});
-
-app.get('/students', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Alumnos`'
-  );
-
-  res.json(result);
-});
-
-app.get('/students/:ci', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Alumnos` WHERE `ci` = ?',
-    [req.params.ci]
-  );
-
-  res.json(result[0]);
-});
-
-app.get('/classes', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Clase`'
-  );
-
-  res.json(result);
-});
+app.get('/class', classRouter);
+app.get('/turn', turnRouter);
+app.get('/student', studentRouter);
 
 app.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');

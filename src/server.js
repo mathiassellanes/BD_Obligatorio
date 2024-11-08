@@ -2,6 +2,9 @@ import express from 'express';
 
 import activityRouter from './routes/activity.js';
 import instructorRouter from './routes/instructor.js';
+import classRouter from './routes/class.js';
+import turnRouter from './routes/turn.js';
+import studentRouter from './routes/student.js';
 import authRouter from './routes/auth.js';
 
 import connection from './db/connection.js';
@@ -19,41 +22,11 @@ app.use('/auth', authRouter);
 app.use(passport.authenticate('jwt', { session: false }))
 
 app.use('/activity',activityRouter);
-app.get('/instructor', instructorRouter);
+app.use('/instructor', instructorRouter);
+app.use('/class', classRouter);
+app.use('/turn', turnRouter);
+app.use('/student', studentRouter);
 
-
-app.get('/turns', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Turnos`'
-  );
-
-  res.json(result);
-});
-
-app.get('/students', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Alumnos`'
-  );
-
-  res.json(result);
-});
-
-app.get('/students/:ci', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Alumnos` WHERE `ci` = ?',
-    [req.params.ci]
-  );
-
-  res.json(result[0]);
-});
-
-app.get('/classes', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Clase`'
-  );
-
-  res.json(result);
-});
 
 app.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');

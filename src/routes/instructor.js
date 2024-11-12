@@ -1,24 +1,19 @@
 import { Router } from "express";
 
-import connection from "../db/connection.js";
+import { getInstructor, getInstructorId } from "../dataaccess/instructor";
 
 const router = Router();
 
-router.get('/', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Instructores`'
-  );
+router.get("/", async (req, res) => {
+  const instructor = await getInstructor();
 
-  res.json(result);
+  res.json(instructor);
 });
 
-router.get('/:ci', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Instructores` WHERE `ci` = ?',
-    [req.params.ci]
-  );
+router.get("/:ci", async (req, res) => {
+  const instructorId = await getInstructorId();
 
-  res.json(result[0]);
+  res.json(instructorId);
 });
 
 export default router;

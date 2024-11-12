@@ -1,24 +1,19 @@
 import { Router } from "express";
 
-import connection from "../db/connection.js";
+import { getTurns, getTurnsId } from "../dataaccess/turn.js";
 
 const router = Router();
 
-router.get('/', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Turnos`'
-  );
+router.get("/", async () => {
+  const turns = await getTurns();
 
-  res.json(result);
+  res.json(turns);
 });
 
-router.get('/:id', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Turnos` WHERE `id` = ?',
-    [req.params.id]
-  );
+router.get("/:id", async () => {
+  const turnsId = await getTurnsId();
 
-  res.json(result[0]);
+  res.json(turnsId);
 });
 
 export default router;

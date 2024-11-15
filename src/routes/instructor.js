@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { getInstructor, getInstructorById } from "../dataaccess/instructor";
+import { getInstructor, getInstructorById } from "../dataaccess/instructor.js";
 
 const router = Router();
 

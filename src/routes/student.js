@@ -1,11 +1,11 @@
 import { Router } from "express";
 
-import { getStudentes, getStudentsById } from "../dataaccess/activity.js";
+import { getStudents, getStudentsById } from "../dataaccess/student.js";
 
 const router = Router();
 
 router.get('/', async (req, res) => {
-  const students = await getStudentes();
+  const students = await getStudents();
 
   res.json(students);
 });

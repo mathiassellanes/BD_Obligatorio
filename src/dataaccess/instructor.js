@@ -1,4 +1,4 @@
-import connection from "../db/connection";
+import connection from "../db/connection.js";
 
 const getInstructor = async () => {
   const [result] = await connection

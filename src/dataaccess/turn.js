@@ -1,4 +1,4 @@
-import connection from "../db/connection";
+import connection from "../db/connection.js";
 
 const getTurns = async () => {
   const [result] = await connection.promise().query("SELECT * FROM `Turnos`");

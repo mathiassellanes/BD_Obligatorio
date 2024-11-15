@@ -1,17 +1,17 @@
 import connection from "../db/connection";
 
-const getTurns = async (req, res) => {
+const getTurns = async () => {
   const [result] = await connection.promise().query("SELECT * FROM `Turnos`");
 
   return result;
 };
 
-const getTurnsId = async (req, res) => {
+const getTurnsById = async ({id}) => {
   const [result] = await connection
     .promise()
-    .query("SELECT * FROM `Turnos` WHERE `id` = ?", [req.params.id]);
+    .query("SELECT * FROM `Turnos` WHERE `id` = ?", [id]);
 
   return result;
 };
 
-export { getTurns, getTurnsId };
+export { getTurns, getTurnsById };

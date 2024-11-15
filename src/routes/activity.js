@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { getActivities, getActivitiesId } from "../dataaccess/activity.js";
+import { getActivities, getActivitiesById } from "../dataaccess/activity.js";
 
 const router = Router();
 
@@ -11,9 +11,11 @@ router.get("/", async () => {
 });
 
 router.get("/:id", async () => {
-  const activitiesId = await getActivitiesId();
+  const { id } = req.params;
 
-  res.json(activitiesId);
+  const activitiesById = await getActivitiesById({ id });
+
+  res.json(activitiesById);
 });
 
 export default router;

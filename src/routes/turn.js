@@ -1,6 +1,5 @@
 import { Router } from "express";
-
-import { getTurns, getTurnsId } from "../dataaccess/turn.js";
+import { getTurns, getTurnsById } from "../dataaccess/turn.js";
 
 const router = Router();
 
@@ -11,9 +10,11 @@ router.get("/", async () => {
 });
 
 router.get("/:id", async () => {
-  const turnsId = await getTurnsId();
+  const { id } = req.params;
+  
+  const turnsById = await getTurnsById({id});
 
-  res.json(turnsId);
+  res.json(turnsById);
 });
 
 export default router;

@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { getInstructor, getInstructorId } from "../dataaccess/instructor";
+import { getInstructor, getInstructorById } from "../dataaccess/instructor";
 
 const router = Router();
 
@@ -11,9 +11,11 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:ci", async (req, res) => {
-  const instructorId = await getInstructorId();
+  const { id } = req.params;
 
-  res.json(instructorId);
+  const instructorById = await getInstructorById({ id });
+
+  res.json(instructorById);
 });
 
 export default router;

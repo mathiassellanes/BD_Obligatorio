@@ -1,6 +1,6 @@
 import connection from "../db/connection";
 
-const getStudents = async (req, res) => {
+const getStudents = async () => {
   const [result] = await connection
     .promise()
     .query("SELECT * FROM `Alumnos`");
@@ -8,12 +8,12 @@ const getStudents = async (req, res) => {
   return result;
 };
 
-const getStudentsId = async (req, res) => {
+const getStudentsById = async ({ci}) => {
   const [result] = await connection
     .promise()
-    .query("SELECT * FROM `Alumnos` WHERE `ci` = ?", [req.params.ci]);
+    .query("SELECT * FROM `Alumnos` WHERE `ci` = ?", [ci]);
 
   return result;
 };
 
-export { getStudents, getStudentsId};
+export { getStudents, getStudentsById};

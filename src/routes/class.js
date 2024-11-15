@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { getClass, getClassId } from "../dataaccess/class";
+import { getClass, getClassById } from "../dataaccess/class";
 
 const router = Router();
 
@@ -11,9 +11,11 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const classesId = await getClassId();
+  const { id } = req.params;
 
-  res.json(classesId);
+  const classesById = await getClassById({ id });
+
+  res.json(classesById);
 });
 
 export default router;

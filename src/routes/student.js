@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { getStudentes, getStudentsId } from "../dataaccess/activity.js";
+import { getStudentes, getStudentsById } from "../dataaccess/activity.js";
 
 const router = Router();
 
@@ -11,9 +11,11 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:ci', async (req, res) => {
-  const studentsId = await getStudentsId();
+  const { id } = req.params;
 
-  res.json(studentsId);
+  const studentsById = await getStudentsById({ id });
+
+  res.json(studentsById);
 });
 
 export default router;

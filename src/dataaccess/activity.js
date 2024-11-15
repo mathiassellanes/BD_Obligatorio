@@ -1,6 +1,6 @@
 import connection from "../db/connection";
 
-const getActivities = async (req, res) => {
+const getActivities = async () => {
   const [result] = await connection
     .promise()
     .query("SELECT * FROM `Actividades`");
@@ -8,12 +8,12 @@ const getActivities = async (req, res) => {
   return result;
 };
 
-const getActivitiesId = async (req, res) => {
+const getActivitiesById = async ({id}) => {
   const [result] = await connection
     .promise()
-    .query("SELECT * FROM `Actividades` WHERE `id` = ?", [req.params.id]);
+    .query("SELECT * FROM `Actividades` WHERE `id` = ?", [id]);
 
   return result;
 };
 
-export { getActivities, getActivitiesId };
+export { getActivities, getActivitiesById };

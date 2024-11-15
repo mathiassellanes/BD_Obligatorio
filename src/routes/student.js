@@ -1,24 +1,21 @@
 import { Router } from "express";
 
-import connection from "../db/connection.js";
+import { getStudents, getStudentsById } from "../dataaccess/student.js";
 
 const router = Router();
 
 router.get('/', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Alumnos`'
-  );
+  const students = await getStudents();
 
-  res.json(result);
+  res.json(students);
 });
 
 router.get('/:ci', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Alumnos` WHERE `ci` = ?',
-    [req.params.ci]
-  );
+  const { id } = req.params;
 
-  res.json(result[0]);
+  const studentsById = await getStudentsById({ id });
+
+  res.json(studentsById);
 });
 
 export default router;

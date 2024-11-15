@@ -1,24 +1,21 @@
 import { Router } from "express";
 
-import connection from "../db/connection.js";
+import { getClass, getClassById } from "../dataaccess/class.js";
 
 const router = Router();
 
 router.get('/', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Clase`'
-  );
+  const classes = await getClass();
 
-  res.json(result);
+  res.json(classes);
 });
 
 router.get('/:id', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Clase` WHERE `id` = ?',
-    [req.params.id]
-  );
+  const { id } = req.params;
 
-  res.json(result[0]);
+  const classesById = await getClassById({ id });
+
+  res.json(classesById);
 });
 
 export default router;

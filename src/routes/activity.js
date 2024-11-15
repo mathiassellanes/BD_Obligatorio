@@ -1,26 +1,21 @@
 import { Router } from "express";
 
-import connection from "../db/connection.js";
-import passport from "../middlewares/passport.js";
+import { getActivities, getActivitiesById } from "../dataaccess/activity.js";
 
 const router = Router();
 
-router.get('/',
-  async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Actividades`'
-  );
+router.get("/", async () => {
+  const activities = await getActivities();
 
-  res.json(result);
+  res.json(activities);
 });
 
-router.get('/:id', async (req, res) => {
-  const [result] = await connection.promise().query(
-    'SELECT * FROM `Actividades` WHERE `id` = ?',
-    [req.params.id]
-  );
+router.get("/:id", async () => {
+  const { id } = req.params;
 
-  res.json(result[0]);
+  const activitiesById = await getActivitiesById({ id });
+
+  res.json(activitiesById);
 });
 
 export default router;

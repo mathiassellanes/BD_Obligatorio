@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { getTurns, getTurnsById } from "../dataaccess/turn.js";
+import { getTurns, getTurnsById, createTurn } from "../dataaccess/turn.js";
+import { turnSchema } from "../schemas/trun.js";
 
 const router = Router();
 
@@ -16,5 +17,15 @@ router.get("/:id", async (req, res) => {
 
   res.json(turnsById);
 });
+
+router.post(
+  "/",
+  validateSchema(turnSchema),
+  async (req, res) => {
+    const newTurn = await createTurn(body);
+
+    res.json(newTurn);
+  }
+);
 
 export default router;

@@ -1,6 +1,7 @@
 import { Router } from "express";
+import activitySchema from "./validators/activity.js";
 
-import { getActivities, getActivitiesById } from "../dataaccess/activity.js";
+import { getActivities, getActivitiesById, createActivity } from "../dataaccess/activity.js";
 
 const router = Router();
 
@@ -17,5 +18,16 @@ router.get("/:id", async (req, res) => {
 
   res.json(activitiesById);
 });
+
+router.post(
+  "/actividades",
+  validateSchema(activitySchema),
+  async (req, res) => {
+    const newActivity = await createActivity(body);
+
+    res.json(newActivity);
+  }
+);
+
 
 export default router;

@@ -1,11 +1,12 @@
 import { Router } from "express";
+import studentSchema from "./validators/student.js";
 
 import {
   getStudents,
   getStudentsById,
   createStudent,
 } from "../dataaccess/student.js";
-import { body, validationResult } from "express-validator";
+
 
 const router = Router();
 
@@ -24,23 +25,12 @@ router.get("/:ci", async (req, res) => {
 });
 
 router.post(
-  "/",
-  [
-    body("ci").isString().notEmpty(),
-    body("name").isString().notEmpty(),
-    body("lastname").isNumeric().notEmpty(),
-    body("birthdate").isNumeric().notEmpty(),
-  ],
+  "/alumnos",
+  validateSchema(studentSchema),
   async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+    const newStudent = await createStudent(body);
 
-    const { ci, name, lastname, birthdate } = req.body;
-    const newStudent = await createStudent({ ci, name, lastname, birthdate });
-
-    res.status(201).json(newStudent);
+    res.json(newStudent);
   }
 );
 

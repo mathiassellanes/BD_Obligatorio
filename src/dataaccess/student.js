@@ -24,12 +24,12 @@ const getStudentsById = async ({ ci }) => {
   return result;
 };
 
-const createStudent = async ({ ci, name, lastname, birthdate }) => {
+const createStudent = async ({ ci, name, lastname, birthdate, phone, email }) => {
   const [result] = await connection
     .promise()
     .query(
-      "INSERT INTO `Alumnos` (`ci`, `nombre`, `apellido`, `fecha_nacimiento`) VALUES (?, ?, ?, ?)",
-      [ci, name, lastname, birthdate]
+      "INSERT INTO `Alumnos` (`ci`, `nombre`, `apellido`, `fecha_nacimiento`, `telefono`, `email`) VALUES (?, ?, ?, ?, ?, ?)",
+      [ci, name, lastname, birthdate, phone, email]
     );
   return result;
 };

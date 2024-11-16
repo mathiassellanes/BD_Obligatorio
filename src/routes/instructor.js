@@ -1,11 +1,11 @@
 import { Router } from "express";
 
-import { getInstructor, getInstructorById } from "../dataaccess/instructor.js";
+import { getInstructors, getInstructorById } from "../dataaccess/instructor.js";
 
 const router = Router();
 
 router.get("/", async (req, res) => {
-  const instructor = await getInstructor();
+  const instructor = await getInstructors();
 
   res.json(instructor);
 });

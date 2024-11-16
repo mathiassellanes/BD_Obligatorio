@@ -16,4 +16,6 @@ const getStudentsById = async ({ci}) => {
   return result;
 };
 
+// aca va a haber una funcion que reciba la data por parametros y haga un insert, va a retornar lo insertado y lo mismo en routes
+
 export { getStudents, getStudentsById};

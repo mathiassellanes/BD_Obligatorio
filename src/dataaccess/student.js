@@ -1,24 +1,22 @@
 import connection from "../db/connection.js";
 
 const getStudents = async () => {
-  const [result] = await connection
-    .promise()
-    .query("SELECT * FROM `Alumnos`");
+  const [result] = await connection.promise().query("SELECT * FROM `Alumnos`");
 
-    const formattedResult = result.map((row) => ({
-      ci: row.ci,
-      nombreCompleto: `${row.nombre} ${row.apellido}`,
-      nombre: row.nombre,
-      apellido: row.apellido,
-      fechaNacimiento: row.fecha_nacimiento,
-      telefono: row.telefono,
-      correo: row.correo,
-    }));
+  const formattedResult = result.map((row) => ({
+    ci: row.ci,
+    nombreCompleto: `${row.nombre} ${row.apellido}`,
+    nombre: row.nombre,
+    apellido: row.apellido,
+    fechaNacimiento: row.fecha_nacimiento,
+    telefono: row.telefono,
+    correo: row.correo,
+  }));
 
   return formattedResult;
 };
 
-const getStudentsById = async ({ci}) => {
+const getStudentsById = async ({ ci }) => {
   const [result] = await connection
     .promise()
     .query("SELECT * FROM `Alumnos` WHERE `ci` = ?", [ci]);
@@ -26,4 +24,14 @@ const getStudentsById = async ({ci}) => {
   return result;
 };
 
-export { getStudents, getStudentsById};
+const createStudent = async ({ ci, name, lastname, birthdate, phone, email }) => {
+  const [result] = await connection
+    .promise()
+    .query(
+      "INSERT INTO `Alumnos` (`ci`, `nombre`, `apellido`, `fecha_nacimiento`, `telefono`, `email`) VALUES (?, ?, ?, ?, ?, ?)",
+      [ci, name, lastname, birthdate, phone, email]
+    );
+  return result;
+};
+
+export { getStudents, getStudentsById, createStudent };

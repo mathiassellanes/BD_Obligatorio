@@ -21,4 +21,14 @@ const getInstructorById = async ({ci}) => {
   return result;
 };
 
-export { getInstructors, getInstructorById };
+const createInstructor = async ({ ci, name, lastname }) => {
+  const [result] = await connection
+    .promise()
+    .query(
+      "INSERT INTO `Instructores` (`ci`, `nombre`, `apellido`) VALUES (?, ?, ?)",
+      [ci, name, lastname]
+    );
+  return result;
+};
+
+export { getInstructors, getInstructorById, createInstructor };

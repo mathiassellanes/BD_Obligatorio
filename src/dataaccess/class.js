@@ -69,4 +69,14 @@ const getClassById = async ({ id }) => {
   return formattedResult;
 };
 
-export { getClass, getClassById };
+const createClass = async ({ ciInstructor, idActividad, idTurno, diaParaDictar }) => {
+  const [result] = await connection
+    .promise()
+    .query(
+      "INSERT INTO `Clase` ( `ci_instructor`, `id_actividad`, `id_turno`, `dia_para_dictar`) VALUES (?, ?, ?, ?)",
+      [ciInstructor, idActividad, idTurno, diaParaDictar]
+    );
+  return result;
+};
+
+export { getClass, getClassById, createClass};

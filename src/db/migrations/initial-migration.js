@@ -1,4 +1,6 @@
-import connection from "../connection.js";
+/* eslint-disable no-console */
+
+import connection from '../connection.js';
 
 connection.connect();
 

@@ -1,7 +1,8 @@
-import { Router } from "express";
-import classSchema from "./validators/class.js";
+import { Router } from 'express';
+import classSchema from './validators/class.js';
 
-import { getClass, getClassById, createClass } from "../dataaccess/class.js";
+import { getClass, getClassById, createClass } from '../dataaccess/class.js';
+import validateSchema from '../middlewares/validator.js';
 
 const router = Router();
 
@@ -20,12 +21,16 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post(
-  "/clases",
+  '/',
   validateSchema(classSchema),
   async (req, res) => {
-    const newClass = await createClass(body);
+    const newClass = await createClass(req.body);
 
-    res.json(newClass);
+    if (newClass.error) {
+      res.status(400).json(newClass);
+    }
+
+    res.status(201).json(newClass);
   }
 );
 

@@ -1,7 +1,7 @@
-import connection from "../db/connection.js";
+import connection from '../db/connection.js';
 
 const getTurns = async () => {
-  const [result] = await connection.promise().query("SELECT * FROM `Turnos`");
+  const [result] = await connection.promise().query('SELECT * FROM `Turnos`');
 
   const formattedResult = result.map((row) => ({
     id: row.id,
@@ -17,7 +17,7 @@ const getTurns = async () => {
 const getTurnsById = async ({id}) => {
   const [result] = await connection
     .promise()
-    .query("SELECT * FROM `Turnos` WHERE `id` = ?", [id]);
+    .query('SELECT * FROM `Turnos` WHERE `id` = ?', [id]);
 
   return result;
 };
@@ -26,7 +26,7 @@ const createTurn = async ({ id, horaInicio, horaFin }) => {
   const [result] = await connection
     .promise()
     .query(
-      "INSERT INTO `Turnos` (`id`, `hora_inicio`, `hora_fin`) VALUES (?, ?, ?)",
+      'INSERT INTO `Turnos` (`id`, `hora_inicio`, `hora_fin`) VALUES (?, ?, ?)',
       [id, horaInicio, horaFin]
     );
   return result;

@@ -1,5 +1,7 @@
-import connection from "../connection.js";
-import bcrypt from "bcrypt";
+/* eslint-disable no-console */
+
+import connection from '../connection.js';
+import bcrypt from 'bcrypt';
 
 const adminPassword = bcrypt.hashSync('admin123', 10);
 

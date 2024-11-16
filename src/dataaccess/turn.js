@@ -22,4 +22,14 @@ const getTurnsById = async ({id}) => {
   return result;
 };
 
-export { getTurns, getTurnsById };
+const createTurn = async ({ id, horaInicio, horaFin }) => {
+  const [result] = await connection
+    .promise()
+    .query(
+      "INSERT INTO `Turnos` (`id`, `hora_inicio`, `hora_fin`) VALUES (?, ?, ?)",
+      [id, horaInicio, horaFin]
+    );
+  return result;
+};
+
+export { getTurns, getTurnsById, createTurn };

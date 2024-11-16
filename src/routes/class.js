@@ -1,6 +1,7 @@
 import { Router } from "express";
+import classSchema from "./validators/class.js";
 
-import { getClass, getClassById } from "../dataaccess/class.js";
+import { getClass, getClassById, createClass } from "../dataaccess/class.js";
 
 const router = Router();
 
@@ -17,5 +18,16 @@ router.get('/:id', async (req, res) => {
 
   res.json(classesById);
 });
+
+router.post(
+  "/clases",
+  validateSchema(classSchema),
+  async (req, res) => {
+    const newClass = await createClass(body);
+
+    res.json(newClass);
+  }
+);
+
 
 export default router;

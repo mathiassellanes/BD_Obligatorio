@@ -1,6 +1,7 @@
 import { Router } from "express";
+import instructorSchema from "./validators/instructor.js";
 
-import { getInstructors, getInstructorById } from "../dataaccess/instructor.js";
+import { getInstructors, getInstructorById, createInstructor } from "../dataaccess/instructor.js";
 
 const router = Router();
 
@@ -17,5 +18,15 @@ router.get("/:ci", async (req, res) => {
 
   res.json(instructorById);
 });
+
+router.post(
+  "/instrucores",
+  validateSchema(instructorSchema),
+  async (req, res) => {
+    const newInstructor = await createInstructor(body);
+
+    res.json(newInstructor);
+  }
+);
 
 export default router;

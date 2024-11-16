@@ -1,11 +1,16 @@
 import connection from "../db/connection.js";
 
-const getInstructor = async () => {
-  const [result] = await connection
+const getInstructors = async () => {
+  const result = await connection
     .promise()
     .query("SELECT * FROM `Instructores`");
 
-  return result;
+  const formattedResult = result.map((row) => ({
+    ci: row.ci,
+    nombreCompleto: `${row.nombre} ${row.apellido}`,
+  }));
+
+  return formattedResult;
 };
 
 const getInstructorById = async ({ci}) => {
@@ -16,4 +21,4 @@ const getInstructorById = async ({ci}) => {
   return result;
 };
 
-export { getInstructor, getInstructorById };
+export { getInstructors, getInstructorById };

@@ -5,7 +5,17 @@ const getStudents = async () => {
     .promise()
     .query("SELECT * FROM `Alumnos`");
 
-  return result;
+    const formattedResult = result.map((row) => ({
+      ci: row.ci,
+      nombreCompleto: `${row.nombre} ${row.apellido}`,
+      nombre: row.nombre,
+      apellido: row.apellido,
+      fechaNacimiento: row.fecha_nacimiento,
+      telefono: row.telefono,
+      correo: row.correo,
+    }));
+
+  return formattedResult;
 };
 
 const getStudentsById = async ({ci}) => {

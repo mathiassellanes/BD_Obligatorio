@@ -1,9 +1,9 @@
-import connection from "../db/connection.js";
+import connection from '../db/connection.js';
 
 const getActivities = async () => {
   const [result] = await connection
     .promise()
-    .query("SELECT * FROM `Actividades`");
+    .query('SELECT * FROM `Actividades`');
 
   return result;
 };
@@ -11,7 +11,7 @@ const getActivities = async () => {
 const getActivitiesById = async ({id}) => {
   const [result] = await connection
     .promise()
-    .query("SELECT * FROM `Actividades` WHERE `id` = ?", [id]);
+    .query('SELECT * FROM `Actividades` WHERE `id` = ?', [id]);
 
   return result;
 };
@@ -20,7 +20,7 @@ const createActivity = async ({ id, descripcion, costo }) => {
   const [result] = await connection
     .promise()
     .query(
-      "INSERT INTO `Actividades` (`id`, `descripcion`, `costo`) VALUES (?, ?, ?)",
+      'INSERT INTO `Actividades` (`id`, `descripcion`, `costo`) VALUES (?, ?, ?)',
       [id, descripcion, costo]
     );
   return result;

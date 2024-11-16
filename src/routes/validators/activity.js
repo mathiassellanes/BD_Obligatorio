@@ -1,9 +1,9 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 const activitySchema = z.object({
-  id: z.int(),
+  id: z.number(),
   description: z.string(),
-  cost: z.int(),
+  cost: z.number(),
 });
 
-export default turnSchema;
+export default activitySchema;

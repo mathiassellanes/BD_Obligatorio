@@ -1,7 +1,7 @@
-import connection from "../db/connection.js";
+import connection from '../db/connection.js';
 
 const getStudents = async () => {
-  const [result] = await connection.promise().query("SELECT * FROM `Alumnos`");
+  const [result] = await connection.promise().query('SELECT * FROM `Alumnos`');
 
   const formattedResult = result.map((row) => ({
     ci: row.ci,
@@ -19,7 +19,7 @@ const getStudents = async () => {
 const getStudentsById = async ({ ci }) => {
   const [result] = await connection
     .promise()
-    .query("SELECT * FROM `Alumnos` WHERE `ci` = ?", [ci]);
+    .query('SELECT * FROM `Alumnos` WHERE `ci` = ?', [ci]);
 
   return result;
 };
@@ -28,7 +28,7 @@ const createStudent = async ({ ci, name, lastname, birthdate, phone, email }) =>
   const [result] = await connection
     .promise()
     .query(
-      "INSERT INTO `Alumnos` (`ci`, `nombre`, `apellido`, `fecha_nacimiento`, `telefono`, `email`) VALUES (?, ?, ?, ?, ?, ?)",
+      'INSERT INTO `Alumnos` (`ci`, `nombre`, `apellido`, `fecha_nacimiento`, `telefono`, `email`) VALUES (?, ?, ?, ?, ?, ?)',
       [ci, name, lastname, birthdate, phone, email]
     );
   return result;

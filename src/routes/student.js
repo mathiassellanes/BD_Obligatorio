@@ -1,18 +1,21 @@
 import { Router } from "express";
 
-import { getStudents, getStudentsById } from "../dataaccess/student.js";
-import { body, validationResult } from 'express-validator';
-import { createStudent } from "../dataaccess/student.js";
+import {
+  getStudents,
+  getStudentsById,
+  createStudent,
+} from "../dataaccess/student.js";
+import { body, validationResult } from "express-validator";
 
 const router = Router();
 
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   const students = await getStudents();
 
   res.json(students);
 });
 
-router.get('/:ci', async (req, res) => {
+router.get("/:ci", async (req, res) => {
   const { id } = req.params;
 
   const studentsById = await getStudentsById({ id });
@@ -21,12 +24,12 @@ router.get('/:ci', async (req, res) => {
 });
 
 router.post(
-  '/',
+  "/",
   [
-    body('name').isString().notEmpty(),
-    body('lastname').isString().notEmpty(),
-    body('ci').isNumeric().notEmpty(),
-    body('birthdate').isNumeric().notEmpty(),
+    body("ci").isString().notEmpty(),
+    body("name").isString().notEmpty(),
+    body("lastname").isNumeric().notEmpty(),
+    body("birthdate").isNumeric().notEmpty(),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -34,8 +37,8 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, lastname, ci, birthdate } = req.body;
-    const newStudent = await createStudent({ name, lastname, ci, birthdate });
+    const { ci, name, lastname, birthdate } = req.body;
+    const newStudent = await createStudent({ ci, name, lastname, birthdate });
 
     res.status(201).json(newStudent);
   }

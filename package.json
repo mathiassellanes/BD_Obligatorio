@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon ./src/server.js",
-    "db_create": "node ./src/db/create.js && node ./src/db/migrations/initial-migration.js && node ./src/db/seeds/initial-seed.js"
+    "db_create": "node ./src/db/create.js && node ./src/db/migrations/initial-migration.js && node ./src/db/seeds/initial-seed.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "author": "",
   "license": "ISC",
@@ -24,5 +26,8 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1"
   }
 }

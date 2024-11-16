@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import mysql from 'mysql2';
 
 const connection = mysql.createConnection({
@@ -21,6 +23,6 @@ connection.query(createDatabaseQuery, (err) => {
   }
 
   console.log('Database created successfully');
-})
+});
 
 export default connection;

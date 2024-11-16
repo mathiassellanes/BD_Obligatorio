@@ -1,10 +1,10 @@
-import { Router } from "express";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
+import { Router } from 'express';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-import { login } from "../dataaccess/auth.js";
-import validateSchema from "../middlewares/validator.js";
-import loginSchema from "./validators/auth.js";
+import { login } from '../dataaccess/auth.js';
+import validateSchema from '../middlewares/validator.js';
+import loginSchema from './validators/auth.js';
 
 dotenv.config();
 

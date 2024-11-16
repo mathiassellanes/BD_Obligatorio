@@ -1,6 +1,6 @@
-import bcrypt from "bcrypt";
+import bcrypt from 'bcrypt';
 
-import connection from "../db/connection.js";
+import connection from '../db/connection.js';
 
 const getLoginUser = async (mail) => {
   const [result] = await connection.promise().query(
@@ -9,7 +9,7 @@ const getLoginUser = async (mail) => {
   );
 
   return result[0];
-}
+};
 
 const login = async (mail, password) => {
   const [result] = await connection.promise().query(
@@ -28,7 +28,7 @@ const login = async (mail, password) => {
   }
 
   return result[0];
-}
+};
 
 export {
   getLoginUser,

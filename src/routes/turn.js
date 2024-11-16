@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getTurns, getTurnsById, createTurn } from "../dataaccess/turn.js";
-import { turnSchema } from "../schemas/trun.js";
+import { turnSchema } from "../schemas/turn.js";
 
 const router = Router();
 

@@ -1,7 +1,7 @@
 import connection from '../db/connection.js';
 
 const getInstructors = async () => {
-  const result = await connection
+  const [result] = await connection
     .promise()
     .query('SELECT * FROM `Instructores`');
 
@@ -13,7 +13,7 @@ const getInstructors = async () => {
   return formattedResult;
 };
 
-const getInstructorById = async ({ci}) => {
+const getInstructorById = async ({ ci }) => {
   const [result] = await connection
     .promise()
     .query('SELECT * FROM `Instructores` WHERE `ci` = ?', [ci]);

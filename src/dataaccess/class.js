@@ -64,11 +64,13 @@ WHERE Clase.id = ?`, [id]);
       nombre: rows[0].actividad_descripcion,
     },
     turno: {
+      id: rows[0].id_turno,
       horaInicio: rows[0].hora_inicio,
       horaFin: rows[0].hora_fin,
       diaParaDictar: rows[0].dia_para_dictar,
     },
     instructor: {
+      ci: rows[0].ci_instructor,
       nombre: rows[0].instructor_nombre,
       apellido: rows[0].instructor_apellido,
     },
@@ -89,7 +91,7 @@ WHERE Clase.id = ?`, [id]);
   return classInfo;
 };
 
-const createClass = async ({ ciInstructor, idActividad, idTurno, diaParaDictar }) => {
+const createClass = async ({ ciInstructor, idActividad, idTurno, diaParaDictar, alumnos }) => {
   try {
     const [insertResult] = await connection
       .promise()
@@ -97,6 +99,17 @@ const createClass = async ({ ciInstructor, idActividad, idTurno, diaParaDictar }
         'INSERT INTO `Clase` ( `ci_instructor`, `id_actividad`, `id_turno`, `dia_para_dictar`) VALUES (?, ?, ?, ?)',
         [ciInstructor, idActividad, idTurno, diaParaDictar]
       );
+
+    if (alumnos) {
+      const insertValues = alumnos.map(({ ci, idEquipamiento }) => [insertResult.insertId, ci, idEquipamiento]);
+
+      await connection
+        .promise()
+        .query(
+          'INSERT INTO `Alumno_Clase` (`id_clase`, `ci_alumno`, `id_equipamiento`) VALUES ?',
+          [insertValues]
+        );
+    }
 
     return await getClassById({ id: insertResult.insertId });
   }
@@ -107,4 +120,40 @@ const createClass = async ({ ciInstructor, idActividad, idTurno, diaParaDictar }
   }
 };
 
-export { getClass, getClassById, createClass };
+const updateClass = async ({ id, ciInstructor, idActividad, idTurno, diaParaDictar, alumnos }) => {
+  try {
+    await connection
+      .promise()
+      .query(
+        'UPDATE `Clase` SET `ci_instructor` = ?, `id_actividad` = ?, `id_turno` = ?, `dia_para_dictar` = ? WHERE `id` = ?',
+        [ciInstructor, idActividad, idTurno, diaParaDictar, id]
+      );
+
+    await connection
+      .promise()
+      .query(
+        'DELETE FROM `Alumno_Clase` WHERE `id_clase` = ?',
+        [id]
+      );
+
+    if (alumnos) {
+      const insertValues = alumnos.map(({ ci, idEquipamiento }) => [id, ci, idEquipamiento]);
+
+      await connection
+        .promise()
+        .query(
+          'INSERT INTO `Alumno_Clase` (`id_clase`, `ci_alumno`, `id_equipamiento`) VALUES ?',
+          [insertValues]
+        );
+    }
+
+    return await getClassById({ id });
+  }
+  catch (error) {
+    return {
+      error: error.message,
+    };
+  }
+};
+
+export { getClass, getClassById, createClass, updateClass };

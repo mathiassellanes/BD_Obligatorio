@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import classSchema from './validators/class.js';
 
-import { getClass, getClassById, createClass } from '../dataaccess/class.js';
+import { getClass, getClassById, createClass, updateClass } from '../dataaccess/class.js';
 import validateSchema from '../middlewares/validator.js';
 
 const router = Router();
@@ -34,5 +34,20 @@ router.post(
   }
 );
 
+router.put(
+  '/:id',
+  validateSchema(classSchema),
+  async (req, res) => {
+    const { id } = req.params;
+
+    const updatedClass = await updateClass({ id, ...req.body });
+
+    if (updatedClass.error) {
+      res.status(400).json(updatedClass);
+    }
+
+    res.json(updatedClass);
+  }
+);
 
 export default router;

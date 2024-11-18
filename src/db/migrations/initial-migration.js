@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import connection from '../connection.js';
+import connection from "../connection.js";
 
 connection.connect();
 
@@ -74,17 +74,49 @@ const createTablesQuery = `
     FOREIGN KEY (ci_alumno) REFERENCES Alumnos(ci),
     FOREIGN KEY (id_equipamiento) REFERENCES Equipamiento(id)
   );
+
+  -- Vista de Actividades que más ingresos generan
+  CREATE VIEW ActividadesConMasIngresos 
+  AS
+  SELECT a.id AS id_actividad, a.descripcion AS actividad, (a.costo + COALESCE(SUM(e.costo), 0)) * COUNT(ac.id_clase) AS ingresos_totales
+  FROM Actividades a
+  LEFT JOIN Clase c ON a.id = c.id_actividad
+  LEFT JOIN Alumno_Clase ac ON c.id = ac.id_clase
+  LEFT JOIN Equipamiento e ON e.id = ac.id_equipamiento
+  GROUP BY a.id, a.descripcion, a.costo
+  ORDER BY ingresos_totales DESC;
+
+  -- Vista de Actividades con más alumnos
+  CREATE VIEW ActividadesConMasAlumnos
+  AS
+  SELECT a.id AS id_actividad, a.descripcion AS actividad, COUNT(ac.ci_alumno) AS total_alumnos
+  FROM Actividades a
+  LEFT JOIN Clase c ON a.id = c.id_actividad
+  LEFT JOIN Alumno_Clase ac ON c.id = ac.id_clase
+  GROUP BY a.id, a.descripcion
+  ORDER BY total_alumnos DESC;
+
+  -- Vista de turnos con más clases dictadas
+  CREATE VIEW TurnosConMasClasesDictadas
+  AS
+  SELECT t.id AS id_turno, CONCAT(t.hora_inicio, ' - ', t.hora_fin) AS horario, COUNT(c.id) AS total_clases_dictadas
+  FROM Turnos t
+  LEFT JOIN Clase c ON t.id = c.id_turno AND c.dictada = TRUE
+  GROUP BY t.id, t.hora_inicio, t.hora_fin
+  ORDER BY total_clases_dictadas DESC;
 `;
 
-const queries = createTablesQuery.split(';').filter(query => query.trim() !== '');
+const queries = createTablesQuery
+  .split(";")
+  .filter((query) => query.trim() !== "");
 
-queries.forEach(query => {
+queries.forEach((query) => {
   connection.query(query, (err) => {
     if (err) {
       return console.error(err);
     }
 
-    console.log('Table created successfully');
+    console.log("Table created successfully");
   });
 });
 

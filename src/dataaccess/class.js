@@ -12,6 +12,7 @@ INNER JOIN Turnos ON Clase.id_turno = Turnos.id
 LEFT JOIN Alumno_Clase ON Clase.id = Alumno_Clase.id_clase
 `;
 const getClass = async () => {
+  try {
   const [result] = await connection
     .promise()
     .query(`${baseQuery} GROUP BY Clase.id`);
@@ -37,6 +38,11 @@ const getClass = async () => {
   }));
 
   return formattedResult;
+  } catch (error) {
+    return {
+      error: error.message,
+    };
+  }
 };
 
 const getClassById = async ({ id }) => {

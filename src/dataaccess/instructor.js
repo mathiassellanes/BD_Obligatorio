@@ -18,7 +18,58 @@ const getInstructorById = async ({ ci }) => {
     .promise()
     .query('SELECT * FROM `Instructores` WHERE `ci` = ?', [ci]);
 
-  return result;
+  const [classes] = await connection
+    .promise()
+    .query(`SELECT Clase.id AS clase_id, Clase.ci_instructor, Clase.id_actividad, Clase.id_turno, Clase.dictada, Clase.dia_para_dictar,
+      Instructores.nombre AS instructor_nombre, Instructores.apellido AS instructor_apellido,
+      Actividades.descripcion AS actividad_descripcion,
+      Turnos.hora_inicio, Turnos.hora_fin,
+      COUNT(Alumno_Clase.ci_alumno) AS cantidadAlumnos
+FROM Clase
+INNER JOIN Instructores ON Clase.ci_instructor = Instructores.ci
+INNER JOIN Actividades ON Clase.id_actividad = Actividades.id
+INNER JOIN Turnos ON Clase.id_turno = Turnos.id
+LEFT JOIN Alumno_Clase ON Clase.id = Alumno_Clase.id_clase
+WHERE Clase.ci_instructor = ?
+GROUP BY Clase.id
+`, [ci]);
+
+  if (result.length === 0) {
+    return null;
+  }
+
+  const resultRow = result[0];
+
+  console.log(classes);
+
+  const formattedResult = {
+    ci: resultRow.ci,
+    nombreCompleto: `${resultRow.nombre} ${resultRow.apellido}`,
+    nombre: resultRow.nombre,
+    apellido: resultRow.apellido,
+    clases: classes.map((row) => ({
+      id: row.clase_id,
+      actividad: {
+        id: row.id_actividad,
+        nombre: row.actividad_descripcion,
+      },
+      turno: {
+        id: row.id_turno,
+        horaInicio: row.hora_inicio,
+        horaFin: row.hora_fin,
+        diaParaDictar: row.dia_para_dictar,
+      },
+      instructor: {
+        ci: row.ci_instructor,
+        nombre: row.instructor_nombre,
+        apellido: row.instructor_apellido,
+      },
+      dictada: row.dictada,
+      cantidadAlumnos: row.cantidadAlumnos,
+    })),
+  };
+
+  return formattedResult;
 };
 
 const createInstructor = async ({ ci, name, lastname }) => {

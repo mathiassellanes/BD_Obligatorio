@@ -3,8 +3,9 @@ import studentSchema from './validators/student.js';
 
 import {
   getStudents,
-  getStudentsById,
+  getStudentsByCi,
   createStudent,
+  updateStudent,
 } from '../dataaccess/student.js';
 import validateSchema from '../middlewares/validator.js';
 
@@ -18,20 +19,32 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:ci', async (req, res) => {
-  const { id } = req.params;
+  const { ci } = req.params;
 
-  const studentsById = await getStudentsById({ id });
+  const studentsById = await getStudentsByCi({ ci });
 
   res.json(studentsById);
 });
 
 router.post(
-  '/alumnos',
+  '/',
   validateSchema(studentSchema),
   async (req, res) => {
     const newStudent = await createStudent(req.body);
 
     res.json(newStudent);
+  }
+);
+
+router.put(
+  '/:ci',
+  validateSchema(studentSchema),
+  async (req, res) => {
+    const { ci } = req.params;
+
+    const updatedStudent = await updateStudent({ ci, ...req.body });
+
+    res.json(updatedStudent);
   }
 );
 

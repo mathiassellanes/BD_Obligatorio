@@ -1,9 +1,6 @@
 import { Router } from 'express';
 
-
-import instructorSchema from './validators/instructor.js';
-import validateSchema from '../middlewares/validator.js';
-import { getEquipement, getEquipementById } from '../dataaccess/equipement.js';
+import { getEquipement, getEquipementByActiviyId, getEquipementById } from '../dataaccess/equipement.js';
 
 const router = Router();
 
@@ -21,5 +18,12 @@ router.get('/:id', async (req, res) => {
   res.json(instructorById);
 });
 
+router.get('/activity/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const instructorById = await getEquipementByActiviyId({ id });
+
+  res.json(instructorById);
+});
 
 export default router;

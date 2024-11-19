@@ -10,6 +10,7 @@ import turnRouter from './routes/turn.js';
 import studentRouter from './routes/student.js';
 import authRouter from './routes/auth.js';
 import equipementRouter from './routes/equipement.js';
+import overviewRouter from './routes/overview.js';
 
 import connection from './db/connection.js';
 import passport from './middlewares/passport.js';
@@ -34,6 +35,7 @@ app.use('/class', classRouter);
 app.use('/turn', turnRouter);
 app.use('/student', studentRouter);
 app.use('/equipement', equipementRouter);
+app.use('/overview', overviewRouter);
 
 app.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');

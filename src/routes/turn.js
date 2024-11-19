@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getTurns, getTurnsById, createTurn } from '../dataaccess/turn.js';
+import { getTurns, getTurnsById, createTurn, updateTurn } from '../dataaccess/turn.js';
 import turnSchema from './validators/turn.js';
 import validateSchema from '../middlewares/validator.js';
 
@@ -26,6 +26,18 @@ router.post(
     const newTurn = await createTurn(req.body);
 
     res.json(newTurn);
+  }
+);
+
+router.put(
+  '/:id',
+  validateSchema(turnSchema),
+  async (req, res) => {
+    const { id } = req.params;
+
+    const updatedTurn = await updateTurn({ id, ...req.body });
+
+    res.json(updatedTurn);
   }
 );
 

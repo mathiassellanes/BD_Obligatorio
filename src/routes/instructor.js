@@ -14,9 +14,9 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:ci', async (req, res) => {
-  const { id } = req.params;
+  const { ci } = req.params;
 
-  const instructorById = await getInstructorById({ id });
+  const instructorById = await getInstructorById({ ci });
 
   res.json(instructorById);
 });

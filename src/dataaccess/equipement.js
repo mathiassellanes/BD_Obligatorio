@@ -21,4 +21,12 @@ const getEquipementById = async ({ id }) => {
   return result;
 };
 
-export { getEquipementById, getEquipement };
+const getEquipementByActiviyId = async ({ id }) => {
+  const [result] = await connection
+    .promise()
+    .query('SELECT * FROM `Equipamiento` WHERE `id_actividad` = ?', [id]);
+
+  return result;
+};
+
+export { getEquipementById, getEquipement, getEquipementByActiviyId };

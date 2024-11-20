@@ -76,10 +76,13 @@ const createTurn = async ({ horaInicio, horaFin }) => {
   const [result] = await connection
     .promise()
     .query(
-      'INSERT INTO `Turnos` (`id`, `hora_inicio`, `hora_fin`) VALUES (?, ?, ?)',
+      'INSERT INTO `Turnos` (`hora_inicio`, `hora_fin`) VALUES (?, ?)',
       [horaInicio, horaFin]
     );
-  return result;
+
+  const turnReturn = await getTurnsById({ id: result.insertId });
+
+  return turnReturn;
 };
 
 const updateTurn = async ({ id, horaInicio, horaFin }) => {

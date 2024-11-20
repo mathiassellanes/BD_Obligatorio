@@ -3,6 +3,7 @@ import classSchema from './validators/class.js';
 
 import { getClass, getClassById, createClass, updateClass } from '../dataaccess/class.js';
 import validateSchema from '../middlewares/validator.js';
+import { isTurnActive } from '../helpers/dateIsValid.js';
 
 const router = Router();
 
@@ -27,10 +28,12 @@ router.post(
     const newClass = await createClass(req.body);
 
     if (newClass.error) {
-      res.status(400).json(newClass);
+      return res.status(400).json(newClass);
     }
 
-    res.status(201).json(newClass);
+    const createdClass = await getClassById({ id: newClass });
+
+    res.status(201).json(createdClass);
   }
 );
 
@@ -40,10 +43,16 @@ router.put(
   async (req, res) => {
     const { id } = req.params;
 
+    const getClassTurn = await getClassById({ id });
+
+    if (isTurnActive(getClassTurn.turno.horaInicio, getClassTurn.turno.horaFin, getClassTurn.turno.diaParaDictar)) {
+      return res.status(400).json({ error: 'No se puede modificar una clase activa' });
+    }
+
     const updatedClass = await updateClass({ id, ...req.body });
 
     if (updatedClass.error) {
-      res.status(400).json(updatedClass);
+      return res.status(400).json(updatedClass);
     }
 
     res.json(updatedClass);

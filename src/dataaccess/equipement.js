@@ -29,4 +29,12 @@ const getEquipementByActiviyId = async ({ id }) => {
   return result;
 };
 
-export { getEquipementById, getEquipement, getEquipementByActiviyId };
+const getEquipementByIdAndActivityId = async ({ id, idActividad }) => {
+  const [result] = await connection
+    .promise()
+    .query('SELECT * FROM `Equipamiento` WHERE `id` = ? AND `id_actividad` = ?', [id, idActividad]);
+
+  return result[0];
+};
+
+export { getEquipementById, getEquipement, getEquipementByActiviyId, getEquipementByIdAndActivityId };

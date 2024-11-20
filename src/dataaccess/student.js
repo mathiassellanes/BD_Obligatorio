@@ -3,8 +3,6 @@ import connection from '../db/connection.js';
 const getStudents = async () => {
   const [result] = await connection.promise().query('SELECT * FROM `Alumnos`');
 
-  console.log(result);
-
   const formattedResult = result.map((row) => ({
     ci: row.ci,
     nombreCompleto: `${row.nombre} ${row.apellido}`,
@@ -39,9 +37,6 @@ LEFT JOIN Alumno_Clase ON Clase.id = Alumno_Clase.id_clase
 LEFT JOIN Equipamiento ON Alumno_Clase.id_equipamiento = Equipamiento.id
 LEFT JOIN Alumnos ON Alumno_Clase.ci_alumno = Alumnos.ci
 WHERE Alumno_Clase.ci_alumno = ?`, [ci]);
-
-
-  console.log(classes);
 
   if (result.length === 0) {
     return null;

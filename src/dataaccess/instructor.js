@@ -26,9 +26,9 @@ const getInstructorById = async ({ ci }) => {
       Turnos.hora_inicio, Turnos.hora_fin,
       COUNT(Alumno_Clase.ci_alumno) AS cantidadAlumnos
 FROM Clase
-INNER JOIN Instructores ON Clase.ci_instructor = Instructores.ci
-INNER JOIN Actividades ON Clase.id_actividad = Actividades.id
-INNER JOIN Turnos ON Clase.id_turno = Turnos.id
+LEFT JOIN Instructores ON Clase.ci_instructor = Instructores.ci
+LEFT JOIN Actividades ON Clase.id_actividad = Actividades.id
+LEFT JOIN Turnos ON Clase.id_turno = Turnos.id
 LEFT JOIN Alumno_Clase ON Clase.id = Alumno_Clase.id_clase
 WHERE Clase.ci_instructor = ?
 GROUP BY Clase.id
@@ -102,9 +102,21 @@ const updateInstructor = async (ci, { nombre, apellido }) => {
   };
 };
 
+const deleteInstructor = async (ci) => {
+  const instructorDeleted = await connection
+    .promise()
+    .query(
+      'DELETE FROM `Instructores` WHERE `ci` = ?',
+      [ci]
+    );
+
+  return instructorDeleted;
+}
+
 export {
   getInstructors,
   getInstructorById,
   createInstructor,
-  updateInstructor
+  updateInstructor,
+  deleteInstructor,
 };

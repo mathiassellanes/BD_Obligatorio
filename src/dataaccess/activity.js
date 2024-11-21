@@ -21,9 +21,9 @@ const getActivitiesById = async ({ id }) => {
       Turnos.hora_inicio, Turnos.hora_fin,
       COUNT(Alumno_Clase.ci_alumno) AS cantidadAlumnos
 FROM Clase
-INNER JOIN Instructores ON Clase.ci_instructor = Instructores.ci
-INNER JOIN Actividades ON Clase.id_actividad = Actividades.id
-INNER JOIN Turnos ON Clase.id_turno = Turnos.id
+LEFT JOIN Instructores ON Clase.ci_instructor = Instructores.ci
+LEFT JOIN Actividades ON Clase.id_actividad = Actividades.id
+LEFT JOIN Turnos ON Clase.id_turno = Turnos.id
 LEFT JOIN Alumno_Clase ON Clase.id = Alumno_Clase.id_clase
 WHERE Actividades.id = ?
 GROUP BY Clase.id
@@ -64,14 +64,12 @@ GROUP BY Clase.id
   return formattedResult;
 };
 
-const createActivity = async ({ id, descripcion, costo }) => {
-  const [result] = await connection
+const editActivity = async ({ id, descripcion, costo }) => {
+  await connection
     .promise()
-    .query(
-      'INSERT INTO `Actividades` (`id`, `descripcion`, `costo`) VALUES (?, ?, ?)',
-      [id, descripcion, costo]
-    );
-  return result;
+    .query('UPDATE `Actividades` SET `descripcion` = ?, `costo` = ? WHERE `id` = ?', [descripcion, costo, id]);
+
+  return getActivitiesById({ id });
 };
 
-export { getActivities, getActivitiesById, createActivity };
+export { getActivities, getActivitiesById, editActivity };

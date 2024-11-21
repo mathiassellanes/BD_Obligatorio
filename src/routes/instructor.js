@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { getInstructors, getInstructorById, createInstructor, updateInstructor } from '../dataaccess/instructor.js';
+import { getInstructors, getInstructorById, createInstructor, updateInstructor, deleteInstructor } from '../dataaccess/instructor.js';
 
 import { editInstructorSchema, instructorSchema } from './validators/instructor.js';
 import validateSchema from '../middlewares/validator.js';
@@ -41,5 +41,13 @@ router.put('/:ci',
     res.json(updatedInstructor);
   }
 );
+
+router.delete('/:ci', async (req, res) => {
+  const { ci } = req.params;
+
+  const deletedInstructor = await deleteInstructor(ci);
+
+  res.json(deletedInstructor);
+});
 
 export default router;

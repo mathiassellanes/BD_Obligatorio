@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getTurns, getTurnsById, createTurn, updateTurn } from '../dataaccess/turn.js';
+import { getTurns, getTurnsById, createTurn, updateTurn, deleteTurn } from '../dataaccess/turn.js';
 import turnSchema from './validators/turn.js';
 import validateSchema from '../middlewares/validator.js';
 
@@ -40,5 +40,13 @@ router.put(
     res.json(updatedTurn);
   }
 );
+
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const deletedTurn = await deleteTurn(id);
+
+  res.json(deletedTurn);
+});
 
 export default router;

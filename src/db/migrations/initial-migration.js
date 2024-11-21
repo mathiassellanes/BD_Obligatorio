@@ -58,9 +58,9 @@ const createTablesQuery = `
     id_turno INT,
     dictada BOOLEAN NOT NULL DEFAULT FALSE,
     dia_para_dictar DATE NOT NULL,
-    FOREIGN KEY (ci_instructor) REFERENCES Instructores(ci),
+    FOREIGN KEY (ci_instructor) REFERENCES Instructores(ci) ON DELETE SET NULL,
     FOREIGN KEY (id_actividad) REFERENCES Actividades(id),
-    FOREIGN KEY (id_turno) REFERENCES Turnos(id),
+    FOREIGN KEY (id_turno) REFERENCES Turnos(id) ON DELETE SET NULL,
     UNIQUE (ci_instructor, id_turno, dia_para_dictar)
   );
 
@@ -72,11 +72,11 @@ const createTablesQuery = `
     PRIMARY KEY (id_clase, ci_alumno),
     FOREIGN KEY (id_clase) REFERENCES Clase(id),
     FOREIGN KEY (ci_alumno) REFERENCES Alumnos(ci),
-    FOREIGN KEY (id_equipamiento) REFERENCES Equipamiento(id)
+    FOREIGN KEY (id_equipamiento) REFERENCES Equipamiento(id) ON DELETE SET NULL
   );
 
   -- Vista de Actividades que más ingresos generan
-  CREATE VIEW ActividadesConMasIngresos 
+  CREATE VIEW ActividadesConMasIngresos
   AS
   SELECT a.id AS id_actividad, a.descripcion AS actividad, (a.costo + COALESCE(SUM(e.costo), 0)) * COUNT(ac.id_clase) AS ingresos_totales
   FROM Actividades a

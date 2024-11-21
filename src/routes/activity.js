@@ -22,10 +22,10 @@ router.get('/:id', async (req, res) => {
 });
 
 router.put('/:id', validateSchema(activitySchema), async (req, res) => {
-  const { descripcion, costo } = req.body;
+  const { descripcion, costo, edadMinima } = req.body;
   const { id } = req.params;
 
-  const result = await editActivity({ id, descripcion, costo });
+  const result = await editActivity({ id, descripcion, costo, edadMinima });
 
   res.json(result);
 });

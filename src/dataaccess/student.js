@@ -1,4 +1,6 @@
 import connection from '../db/connection.js';
+import { getDateBasedOnAge } from '../helpers/dateIsValid.js';
+import { getActivitiesById } from './activity.js';
 
 const getStudents = async () => {
   const [result] = await connection.promise().query('SELECT * FROM `Alumnos`');
@@ -120,7 +122,7 @@ const updateStudent = async ({ ci, nombre, apellido, fechaNacimiento, telefono, 
     );
 
 
-  return getStudentsByCi({ ci })
+  return getStudentsByCi({ ci });
 };
 
 const deleteStudent = async (ci) => {
@@ -141,4 +143,36 @@ const deleteStudent = async (ci) => {
   return studentDeleted;
 };
 
-export { getStudents, getStudentsByCi, createStudent, updateStudent, getStudentByCi, deleteStudent };
+const getStudentsByActivityAvailable = async ({ idActividad }) => {
+  const activity = await getActivitiesById({ id: idActividad });
+
+  const ageMin = activity.edadMinima;
+
+  const minDate = getDateBasedOnAge(ageMin);
+
+  const [result] = await connection
+    .promise()
+    .query('SELECT * FROM `Alumnos` WHERE fecha_nacimiento <= ?', [minDate]);
+
+  const formattedResult = result.map((row) => ({
+    ci: row.ci,
+    nombreCompleto: `${row.nombre} ${row.apellido}`,
+    nombre: row.nombre,
+    apellido: row.apellido,
+    fechaNacimiento: row.fecha_nacimiento,
+    telefono: row.telefono,
+    correo: row.correo,
+  }));
+
+  return formattedResult;
+};
+
+export {
+  getStudents,
+  getStudentsByCi,
+  createStudent,
+  updateStudent,
+  getStudentByCi,
+  deleteStudent,
+  getStudentsByActivityAvailable
+};

@@ -16,3 +16,22 @@ export const isTurnActive = (horaInicio, horaFin, diaParaDictar) => {
     currentDate <= endTime
   );
 };
+
+export const getAge = (birthDate) => {
+  const today = new Date();
+  const birth = new Date(birthDate);
+  let age = today.getFullYear() - birth.getFullYear();
+  const month = today.getMonth() - birth.getMonth();
+
+  if (month < 0 || (month === 0 && today.getDate() < birth.getDate())) {
+    age -= 1;
+  }
+
+  return age;
+};
+
+export const getDateBasedOnAge = (age) => {
+  const today = new Date();
+  today.setFullYear(today.getFullYear() - age);
+  return today;
+};

@@ -7,16 +7,21 @@ SELECT Clase.id, Clase.ci_instructor, Clase.id_actividad, Clase.id_turno, Clase.
        Turnos.hora_inicio, Turnos.hora_fin,
        COUNT(Alumno_Clase.ci_alumno) AS cantidadAlumnos
 FROM Clase
-INNER JOIN Instructores ON Clase.ci_instructor = Instructores.ci
-INNER JOIN Actividades ON Clase.id_actividad = Actividades.id
-INNER JOIN Turnos ON Clase.id_turno = Turnos.id
+LEFT JOIN Instructores ON Clase.ci_instructor = Instructores.ci
+LEFT JOIN Actividades ON Clase.id_actividad = Actividades.id
+LEFT JOIN Turnos ON Clase.id_turno = Turnos.id
 LEFT JOIN Alumno_Clase ON Clase.id = Alumno_Clase.id_clase
 `;
+
 const getClass = async () => {
   try {
     const [result] = await connection
       .promise()
       .query(`${baseQuery} GROUP BY Clase.id`);
+
+    if (result.length === 0) {
+      return null;
+    }
 
     const formattedResult = result.map((row) => ({
       id: row.id,
@@ -56,13 +61,17 @@ const getClassById = async ({ id }) => {
        Alumnos.ci AS alumno_ci, Alumnos.nombre AS alumno_nombre, Alumnos.apellido AS alumno_apellido, Alumnos.correo as alumno_correo,
        Equipamiento.id AS equipamiento_id, Equipamiento.descripcion AS equipamiento_descripcion
 FROM Clase
-INNER JOIN Instructores ON Clase.ci_instructor = Instructores.ci
-INNER JOIN Actividades ON Clase.id_actividad = Actividades.id
-INNER JOIN Turnos ON Clase.id_turno = Turnos.id
+LEFT JOIN Instructores ON Clase.ci_instructor = Instructores.ci
+LEFT JOIN Actividades ON Clase.id_actividad = Actividades.id
+LEFT JOIN Turnos ON Clase.id_turno = Turnos.id
 LEFT JOIN Alumno_Clase ON Clase.id = Alumno_Clase.id_clase
 LEFT JOIN Equipamiento ON Alumno_Clase.id_equipamiento = Equipamiento.id
 LEFT JOIN Alumnos ON Alumno_Clase.ci_alumno = Alumnos.ci
 WHERE Clase.id = ?`, [id]);
+
+  if (rows.length === 0) {
+    return null;
+  }
 
   const alumnos = rows
     .filter(row => row.alumno_ci)
@@ -183,4 +192,29 @@ const updateClass = async ({ id, ciInstructor, idActividad, idTurno, diaParaDict
   }
 };
 
-export { getClass, getClassById, createClass, updateClass };
+const deleteClass = async ({ id }) => {
+  try {
+    await connection
+      .promise()
+      .query(
+        'DELETE FROM `Alumno_Clase` WHERE `id_clase` = ?',
+        [id]
+      );
+
+    await connection
+      .promise()
+      .query(
+        'DELETE FROM `Clase` WHERE `id` = ?',
+        [id]
+      );
+
+    return true;
+  }
+  catch (error) {
+    return {
+      error: error.message,
+    };
+  }
+};
+
+export { getClass, getClassById, createClass, updateClass, deleteClass };

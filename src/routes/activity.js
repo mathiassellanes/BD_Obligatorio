@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { getActivities, getActivitiesById, createActivity } from '../dataaccess/activity.js';
+import { getActivities, getActivitiesById,editActivity } from '../dataaccess/activity.js';
 
 import activitySchema from './validators/activity.js';
 import validateSchema from '../middlewares/validator.js';
@@ -21,14 +21,13 @@ router.get('/:id', async (req, res) => {
   res.json(activitiesById);
 });
 
-router.post(
-  '/actividades',
-  validateSchema(activitySchema),
-  async (req, res) => {
-    const newActivity = await createActivity(req.body);
+router.put('/:id', validateSchema(activitySchema), async (req, res) => {
+  const { descripcion, costo } = req.body;
+  const { id } = req.params;
 
-    res.json(newActivity);
-  }
-);
+  const result = await editActivity({ id, descripcion, costo });
+
+  res.json(result);
+});
 
 export default router;

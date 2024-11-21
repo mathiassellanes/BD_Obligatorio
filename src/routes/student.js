@@ -6,7 +6,9 @@ import {
   getStudentsByCi,
   createStudent,
   updateStudent,
+  deleteStudent,
 } from '../dataaccess/student.js';
+
 import validateSchema from '../middlewares/validator.js';
 
 
@@ -47,5 +49,13 @@ router.put(
     res.json(updatedStudent);
   }
 );
+
+router.delete('/:ci', async (req, res) => {
+  const { ci } = req.params;
+
+  const deletedStudent = await deleteStudent(ci);
+
+  res.json(deletedStudent);
+});
 
 export default router;

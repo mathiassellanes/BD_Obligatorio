@@ -5,7 +5,14 @@ const getActivities = async () => {
     .promise()
     .query('SELECT * FROM `Actividades`');
 
-  return result;
+  const formattedResult = result.map((row) => ({
+    id: row.id,
+    descripcion: row.descripcion,
+    edadMinima: row.edad_minima,
+    costo: row.costo,
+  }));
+
+  return formattedResult;
 };
 
 const getActivitiesById = async ({ id }) => {
@@ -38,6 +45,7 @@ GROUP BY Clase.id
   const formattedResult = {
     id: resultRow.id,
     descripcion: resultRow.descripcion,
+    edadMinima: resultRow.edad_minima,
     costo: resultRow.costo,
     clases: classes.map((row) => ({
       id: row.clase_id,
@@ -64,10 +72,10 @@ GROUP BY Clase.id
   return formattedResult;
 };
 
-const editActivity = async ({ id, descripcion, costo }) => {
+const editActivity = async ({ id, descripcion, costo, edadMinima }) => {
   await connection
     .promise()
-    .query('UPDATE `Actividades` SET `descripcion` = ?, `costo` = ? WHERE `id` = ?', [descripcion, costo, id]);
+    .query('UPDATE `Actividades` SET `descripcion` = ?, `costo` = ?, `edad_minima` = ? WHERE `id` = ?', [descripcion, costo, edadMinima, id]);
 
   return getActivitiesById({ id });
 };

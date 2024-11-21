@@ -7,6 +7,7 @@ import {
   createStudent,
   updateStudent,
   deleteStudent,
+  getStudentsByActivityAvailable,
 } from '../dataaccess/student.js';
 
 import validateSchema from '../middlewares/validator.js';
@@ -20,12 +21,21 @@ router.get('/', async (req, res) => {
   res.json(students);
 });
 
+
 router.get('/:ci', async (req, res) => {
   const { ci } = req.params;
 
   const studentsById = await getStudentsByCi({ ci });
 
   res.json(studentsById);
+});
+
+router.get('/activity-available/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const studentsByActivityId = await getStudentsByActivityAvailable({ idActividad: id });
+
+  res.json(studentsByActivityId);
 });
 
 router.post(

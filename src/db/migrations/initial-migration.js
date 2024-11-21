@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import connection from "../connection.js";
+import connection from '../connection.js';
 
 connection.connect();
 
@@ -14,6 +14,7 @@ const createTablesQuery = `
   CREATE TABLE Actividades (
     id INT AUTO_INCREMENT PRIMARY KEY,
     descripcion VARCHAR(255) NOT NULL,
+    edad_minima INT NOT NULL DEFAULT 0,
     costo DECIMAL(10, 2) NOT NULL
   );
 

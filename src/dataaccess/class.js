@@ -1,5 +1,8 @@
 import connection from '../db/connection.js';
+import { getAge } from '../helpers/dateIsValid.js';
+import { getActivitiesById } from './activity.js';
 import { getEquipementByIdAndActivityId } from './equipement.js';
+import { getStudentByCi } from './student.js';
 const baseQuery = `
 SELECT Clase.id, Clase.ci_instructor, Clase.id_actividad, Clase.id_turno, Clase.dictada, Clase.dia_para_dictar,
        Instructores.nombre, Instructores.apellido,
@@ -111,6 +114,8 @@ WHERE Clase.id = ?`, [id]);
 };
 
 const createClass = async ({ ciInstructor, idActividad, idTurno, diaParaDictar, alumnos }) => {
+  connection.beginTransaction();
+
   try {
     const [insertResult] = await connection
       .promise()
@@ -120,16 +125,42 @@ const createClass = async ({ ciInstructor, idActividad, idTurno, diaParaDictar, 
       );
 
     if (alumnos && alumnos.length > 0) {
+      const activity = await getActivitiesById({ id: idActividad });
+
       const insertValues = await Promise.all(alumnos.map(async ({ ci, idEquipamiento }) => {
         const equipamiento = await getEquipementByIdAndActivityId({ id: idEquipamiento, idActividad });
+        const student = await getStudentByCi({ ci });
+
+        if (!student) {
+          return {
+            error: `El alumno con CI ${ci} no existe`,
+          };
+        }
+
+        const edad = getAge(student.fechaNacimiento);
+
+        if (edad <= activity.edadMinima) {
+          return {
+            error: `El alumno con CI ${ci} no cumple con la edad mínima para la actividad`,
+          };
+        }
 
         if (equipamiento) {
           return [insertResult.insertId, ci, idEquipamiento];
         }
 
+
+
         return [insertResult.insertId, ci, null];
       }));
 
+      if (insertValues.some(value => value.error)) {
+        connection.rollback();
+
+        return {
+          error: insertValues.map(value => value.error).join(', '),
+        };
+      }
 
       await connection
         .promise()
@@ -142,6 +173,8 @@ const createClass = async ({ ciInstructor, idActividad, idTurno, diaParaDictar, 
     return insertResult.insertId;
   }
   catch (error) {
+    connection.rollback();
+
     return {
       error: error.message,
     };

@@ -11,10 +11,10 @@ const createTablesQuery = `
  INSERT INTO Login (correo, contraseña) VALUES ('admin@escuela.com', '${adminPassword}');
 
 -- Datos en Actividades
-INSERT INTO Actividades (id, descripcion, costo) VALUES
-(1, 'Snowboard', 200.00),
-(2, 'Ski', 180.00),
-(3, 'Moto de Nieve', 250.00);
+INSERT INTO Actividades (id, descripcion, costo, edad_minima) VALUES
+(1, 'Snowboard', 200.00, 12),
+(2, 'Ski', 180.00, 16),
+(3, 'Moto de Nieve', 250.00, 20);
 
 -- Datos en Equipamiento
 INSERT INTO Equipamiento (id, id_actividad, descripcion, costo) VALUES

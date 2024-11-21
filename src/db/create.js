@@ -12,7 +12,7 @@ const connection = mysql.createConnection({
 });
 
 const createDatabaseQuery = `
-  CREATE DATABASE IF NOT EXISTS escuela_deportes;
+  CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}
 `;
 
 connection.query(createDatabaseQuery, (err) => {

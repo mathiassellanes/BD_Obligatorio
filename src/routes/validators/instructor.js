@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-const turnSchema = z.object({
+export const instructorSchema = z.object({
   ci: z.string().length(8),
-  name: z.string(),
-  lastname: z.string(),
+  nombre: z.string(),
+  apellido: z.string(),
 });
 
-export default turnSchema;
+export const editInstructorSchema = instructorSchema.omit({ ci: true });

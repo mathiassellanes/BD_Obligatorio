@@ -35,8 +35,6 @@ GROUP BY Clase.id
 
   const resultRow = result[0];
 
-  console.log(classes);
-
   const formattedResult = {
     id: resultRow.id,
     descripcion: resultRow.descripcion,

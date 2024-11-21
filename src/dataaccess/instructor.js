@@ -40,8 +40,6 @@ GROUP BY Clase.id
 
   const resultRow = result[0];
 
-  console.log(classes);
-
   const formattedResult = {
     ci: resultRow.ci,
     nombreCompleto: `${resultRow.nombre} ${resultRow.apellido}`,
@@ -72,14 +70,41 @@ GROUP BY Clase.id
   return formattedResult;
 };
 
-const createInstructor = async ({ ci, name, lastname }) => {
-  const [result] = await connection
+const createInstructor = async ({ ci, nombre, apellido }) => {
+  await connection
     .promise()
     .query(
       'INSERT INTO `Instructores` (`ci`, `nombre`, `apellido`) VALUES (?, ?, ?)',
-      [ci, name, lastname]
+      [ci, nombre, apellido]
     );
-  return result;
+
+  return {
+    ci,
+    nombre,
+    apellido,
+    nombreCompleto: `${nombre} ${apellido}`,
+  };
 };
 
-export { getInstructors, getInstructorById, createInstructor };
+const updateInstructor = async (ci, { nombre, apellido }) => {
+  await connection
+    .promise()
+    .query(
+      'UPDATE `Instructores` SET `nombre` = ?, `apellido` = ? WHERE `ci` = ?',
+      [nombre, apellido, ci]
+    );
+
+  return {
+    ci,
+    nombre,
+    apellido,
+    nombreCompleto: `${nombre} ${apellido}`,
+  };
+};
+
+export {
+  getInstructors,
+  getInstructorById,
+  createInstructor,
+  updateInstructor
+};

@@ -1,4 +1,5 @@
 import connection from '../db/connection.js';
+import { getEquipementByIdAndActivityId } from './equipement.js';
 const baseQuery = `
 SELECT Clase.id, Clase.ci_instructor, Clase.id_actividad, Clase.id_turno, Clase.dictada, Clase.dia_para_dictar,
        Instructores.nombre, Instructores.apellido,
@@ -13,31 +14,31 @@ LEFT JOIN Alumno_Clase ON Clase.id = Alumno_Clase.id_clase
 `;
 const getClass = async () => {
   try {
-  const [result] = await connection
-    .promise()
-    .query(`${baseQuery} GROUP BY Clase.id`);
+    const [result] = await connection
+      .promise()
+      .query(`${baseQuery} GROUP BY Clase.id`);
 
-  const formattedResult = result.map((row) => ({
-    id: row.id,
-    actividad: {
-      id: row.id_actividad,
-      nombre: row.descripcion,
-    },
-    turno: {
-      horaInicio: row.hora_inicio,
-      horaFin: row.hora_fin,
-      diaParaDictar: row.dia_para_dictar,
-    },
-    instructor: {
-      ci: row.ci,
-      nombre: row.nombre,
-      apellido: row.apellido,
-    },
-    dictada: row.dictada,
-    cantidadAlumnos: row.cantidadAlumnos,
-  }));
+    const formattedResult = result.map((row) => ({
+      id: row.id,
+      actividad: {
+        id: row.id_actividad,
+        nombre: row.descripcion,
+      },
+      turno: {
+        horaInicio: row.hora_inicio,
+        horaFin: row.hora_fin,
+        diaParaDictar: row.dia_para_dictar,
+      },
+      instructor: {
+        ci: row.ci,
+        nombre: row.nombre,
+        apellido: row.apellido,
+      },
+      dictada: row.dictada,
+      cantidadAlumnos: row.cantidadAlumnos,
+    }));
 
-  return formattedResult;
+    return formattedResult;
   } catch (error) {
     return {
       error: error.message,
@@ -53,7 +54,7 @@ const getClassById = async ({ id }) => {
        Actividades.descripcion AS actividad_descripcion,
        Turnos.hora_inicio, Turnos.hora_fin,
        Alumnos.ci AS alumno_ci, Alumnos.nombre AS alumno_nombre, Alumnos.apellido AS alumno_apellido, Alumnos.correo as alumno_correo,
-        Equipamiento.id AS equipamiento_id, Equipamiento.descripcion AS equipamiento_descripcion
+       Equipamiento.id AS equipamiento_id, Equipamiento.descripcion AS equipamiento_descripcion
 FROM Clase
 INNER JOIN Instructores ON Clase.ci_instructor = Instructores.ci
 INNER JOIN Actividades ON Clase.id_actividad = Actividades.id
@@ -62,6 +63,18 @@ LEFT JOIN Alumno_Clase ON Clase.id = Alumno_Clase.id_clase
 LEFT JOIN Equipamiento ON Alumno_Clase.id_equipamiento = Equipamiento.id
 LEFT JOIN Alumnos ON Alumno_Clase.ci_alumno = Alumnos.ci
 WHERE Clase.id = ?`, [id]);
+
+  const alumnos = rows
+    .filter(row => row.alumno_ci)
+    .map(row => ({
+      ci: row.alumno_ci,
+      nombreCompleto: `${row.alumno_nombre} ${row.alumno_apellido}`,
+      correo: row.alumno_correo,
+      equipamiento: row.equipamiento_id && {
+        id: row.equipamiento_id,
+        descripcion: row.equipamiento_descripcion,
+      },
+    }));
 
   const classInfo = {
     id: rows[0].clase_id,
@@ -81,17 +94,8 @@ WHERE Clase.id = ?`, [id]);
       apellido: rows[0].instructor_apellido,
     },
     dictada: rows[0].dictada,
-    alumnos: rows
-      .filter(row => row.alumno_ci)
-      .map(row => ({
-        ci: row.alumno_ci,
-        nombreCompleto: `${row.alumno_nombre} ${row.alumno_apellido}`,
-        correo: row.alumno_correo,
-        equipamiento: row.equipamiento_id && {
-          id: row.equipamiento_id,
-          descripcion: row.equipamiento_descripcion,
-        },
-      })),
+    cantidadAlumnos: alumnos.length,
+    alumnos,
   };
 
   return classInfo;
@@ -106,8 +110,17 @@ const createClass = async ({ ciInstructor, idActividad, idTurno, diaParaDictar, 
         [ciInstructor, idActividad, idTurno, diaParaDictar]
       );
 
-    if (alumnos) {
-      const insertValues = alumnos.map(({ ci, idEquipamiento }) => [insertResult.insertId, ci, idEquipamiento]);
+    if (alumnos && alumnos.length > 0) {
+      const insertValues = await Promise.all(alumnos.map(async ({ ci, idEquipamiento }) => {
+        const equipamiento = await getEquipementByIdAndActivityId({ id: idEquipamiento, idActividad });
+
+        if (equipamiento) {
+          return [insertResult.insertId, ci, idEquipamiento];
+        }
+
+        return [insertResult.insertId, ci, null];
+      }));
+
 
       await connection
         .promise()
@@ -117,7 +130,7 @@ const createClass = async ({ ciInstructor, idActividad, idTurno, diaParaDictar, 
         );
     }
 
-    return await getClassById({ id: insertResult.insertId });
+    return insertResult.insertId;
   }
   catch (error) {
     return {
@@ -142,8 +155,16 @@ const updateClass = async ({ id, ciInstructor, idActividad, idTurno, diaParaDict
         [id]
       );
 
-    if (alumnos) {
-      const insertValues = alumnos.map(({ ci, idEquipamiento }) => [id, ci, idEquipamiento]);
+    if (alumnos && alumnos.length > 0) {
+      const insertValues = await Promise.all(alumnos.map(async ({ ci, idEquipamiento }) => {
+        const equipamiento = await getEquipementByIdAndActivityId({ id: idEquipamiento, idActividad });
+
+        if (equipamiento) {
+          return [id, ci, idEquipamiento];
+        }
+
+        return [id, ci, null];
+      }));
 
       await connection
         .promise()

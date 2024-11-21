@@ -1,5 +1,5 @@
-import connection from '../db/connection.js';
-import { getEquipementByIdAndActivityId } from './equipement.js';
+import connection from "../db/connection.js";
+import { getEquipementByIdAndActivityId } from "./equipement.js";
 const baseQuery = `
 SELECT Clase.id, Clase.ci_instructor, Clase.id_actividad, Clase.id_turno, Clase.dictada, Clase.dia_para_dictar,
        Instructores.nombre, Instructores.apellido,
@@ -52,9 +52,8 @@ const getClass = async () => {
 };
 
 const getClassById = async ({ id }) => {
-  const [rows] = await connection
-    .promise()
-    .query(`SELECT Clase.id AS clase_id, Clase.ci_instructor, Clase.id_actividad, Clase.id_turno, Clase.dictada, Clase.dia_para_dictar,
+  const [rows] = await connection.promise().query(
+    `SELECT Clase.id AS clase_id, Clase.ci_instructor, Clase.id_actividad, Clase.id_turno, Clase.dictada, Clase.dia_para_dictar,
        Instructores.nombre AS instructor_nombre, Instructores.apellido AS instructor_apellido,
        Actividades.descripcion AS actividad_descripcion,
        Turnos.hora_inicio, Turnos.hora_fin,
@@ -67,15 +66,17 @@ LEFT JOIN Turnos ON Clase.id_turno = Turnos.id
 LEFT JOIN Alumno_Clase ON Clase.id = Alumno_Clase.id_clase
 LEFT JOIN Equipamiento ON Alumno_Clase.id_equipamiento = Equipamiento.id
 LEFT JOIN Alumnos ON Alumno_Clase.ci_alumno = Alumnos.ci
-WHERE Clase.id = ?`, [id]);
+WHERE Clase.id = ?`,
+    [id]
+  );
 
   if (rows.length === 0) {
     return null;
   }
 
   const alumnos = rows
-    .filter(row => row.alumno_ci)
-    .map(row => ({
+    .filter((row) => row.alumno_ci)
+    .map((row) => ({
       ci: row.alumno_ci,
       nombreCompleto: `${row.alumno_nombre} ${row.alumno_apellido}`,
       correo: row.alumno_correo,
@@ -110,85 +111,110 @@ WHERE Clase.id = ?`, [id]);
   return classInfo;
 };
 
-const createClass = async ({ ciInstructor, idActividad, idTurno, diaParaDictar, alumnos }) => {
+const createClass = async ({
+  ciInstructor,
+  idActividad,
+  idTurno,
+  diaParaDictar,
+  alumnos,
+}) => {
   try {
     const [insertResult] = await connection
       .promise()
       .query(
-        'INSERT INTO `Clase` ( `ci_instructor`, `id_actividad`, `id_turno`, `dia_para_dictar`) VALUES (?, ?, ?, ?)',
+        "INSERT INTO `Clase` ( `ci_instructor`, `id_actividad`, `id_turno`, `dia_para_dictar`) VALUES (?, ?, ?, ?)",
         [ciInstructor, idActividad, idTurno, diaParaDictar]
       );
 
     if (alumnos && alumnos.length > 0) {
-      const insertValues = await Promise.all(alumnos.map(async ({ ci, idEquipamiento }) => {
-        const equipamiento = await getEquipementByIdAndActivityId({ id: idEquipamiento, idActividad });
+      const insertValues = await Promise.all(
+        alumnos.map(async ({ ci, idEquipamiento }) => {
+          const equipamiento = await getEquipementByIdAndActivityId({
+            id: idEquipamiento,
+            idActividad,
+          });
 
-        if (equipamiento) {
-          return [insertResult.insertId, ci, idEquipamiento];
-        }
+          if (equipamiento) {
+            return [insertResult.insertId, ci, idEquipamiento];
+          }
 
-        return [insertResult.insertId, ci, null];
-      }));
-
+          return [insertResult.insertId, ci, null];
+        })
+      );
 
       await connection
         .promise()
         .query(
-          'INSERT INTO `Alumno_Clase` (`id_clase`, `ci_alumno`, `id_equipamiento`) VALUES ?',
+          "INSERT INTO `Alumno_Clase` (`id_clase`, `ci_alumno`, `id_equipamiento`) VALUES ?",
           [insertValues]
         );
     }
 
     return insertResult.insertId;
-  }
-  catch (error) {
-    return {
-      error: error.message,
-    };
+  } catch (error) {
+    console.error("Error al crear clase:", error.message);
+
+    if (error.errno === 1644) {
+      throw new Error(error.sqlMessage);
+    }
+
+    throw new Error("Error interno al crear clase.");
   }
 };
 
-const updateClass = async ({ id, ciInstructor, idActividad, idTurno, diaParaDictar, alumnos }) => {
+const updateClass = async ({
+  id,
+  ciInstructor,
+  idActividad,
+  idTurno,
+  diaParaDictar,
+  alumnos,
+}) => {
   try {
     await connection
       .promise()
       .query(
-        'UPDATE `Clase` SET `ci_instructor` = ?, `id_actividad` = ?, `id_turno` = ?, `dia_para_dictar` = ? WHERE `id` = ?',
+        "UPDATE `Clase` SET `ci_instructor` = ?, `id_actividad` = ?, `id_turno` = ?, `dia_para_dictar` = ? WHERE `id` = ?",
         [ciInstructor, idActividad, idTurno, diaParaDictar, id]
       );
 
     await connection
       .promise()
-      .query(
-        'DELETE FROM `Alumno_Clase` WHERE `id_clase` = ?',
-        [id]
-      );
+      .query("DELETE FROM `Alumno_Clase` WHERE `id_clase` = ?", [id]);
 
     if (alumnos && alumnos.length > 0) {
-      const insertValues = await Promise.all(alumnos.map(async ({ ci, idEquipamiento }) => {
-        const equipamiento = await getEquipementByIdAndActivityId({ id: idEquipamiento, idActividad });
+      const insertValues = await Promise.all(
+        alumnos.map(async ({ ci, idEquipamiento }) => {
+          const equipamiento = await getEquipementByIdAndActivityId({
+            id: idEquipamiento,
+            idActividad,
+          });
 
-        if (equipamiento) {
-          return [id, ci, idEquipamiento];
-        }
+          if (equipamiento) {
+            return [id, ci, idEquipamiento];
+          }
 
-        return [id, ci, null];
-      }));
+          return [id, ci, null];
+        })
+      );
 
       await connection
         .promise()
         .query(
-          'INSERT INTO `Alumno_Clase` (`id_clase`, `ci_alumno`, `id_equipamiento`) VALUES ?',
+          "INSERT INTO `Alumno_Clase` (`id_clase`, `ci_alumno`, `id_equipamiento`) VALUES ?",
           [insertValues]
         );
     }
 
     return await getClassById({ id });
-  }
-  catch (error) {
-    return {
-      error: error.message,
-    };
+  } catch (error) {
+    console.error("Error al actualizar clase:", error.message);
+
+    if (error.errno === 1644) {
+      throw new Error(error.sqlMessage);
+    }
+
+    throw new Error("Error interno al actualizar clase.");
   }
 };
 
@@ -196,21 +222,14 @@ const deleteClass = async ({ id }) => {
   try {
     await connection
       .promise()
-      .query(
-        'DELETE FROM `Alumno_Clase` WHERE `id_clase` = ?',
-        [id]
-      );
+      .query("DELETE FROM `Alumno_Clase` WHERE `id_clase` = ?", [id]);
 
     await connection
       .promise()
-      .query(
-        'DELETE FROM `Clase` WHERE `id` = ?',
-        [id]
-      );
+      .query("DELETE FROM `Clase` WHERE `id` = ?", [id]);
 
     return true;
-  }
-  catch (error) {
+  } catch (error) {
     return {
       error: error.message,
     };

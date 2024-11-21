@@ -1,9 +1,9 @@
-import connection from '../db/connection.js';
+import connection from "../db/connection.js";
 
 const getActivities = async () => {
   const [result] = await connection
     .promise()
-    .query('SELECT * FROM `Actividades`');
+    .query("SELECT * FROM `Actividades`");
 
   return result;
 };
@@ -11,11 +11,10 @@ const getActivities = async () => {
 const getActivitiesById = async ({ id }) => {
   const [result] = await connection
     .promise()
-    .query('SELECT * FROM `Actividades` WHERE `id` = ?', [id]);
+    .query("SELECT * FROM `Actividades` WHERE `id` = ?", [id]);
 
-  const [classes] = await connection
-    .promise()
-    .query(`SELECT Clase.id AS clase_id, Clase.ci_instructor, Clase.id_actividad, Clase.id_turno, Clase.dictada, Clase.dia_para_dictar,
+  const [classes] = await connection.promise().query(
+    `SELECT Clase.id AS clase_id, Clase.ci_instructor, Clase.id_actividad, Clase.id_turno, Clase.dictada, Clase.dia_para_dictar,
       Instructores.nombre AS instructor_nombre, Instructores.apellido AS instructor_apellido,
       Actividades.descripcion AS actividad_descripcion,
       Turnos.hora_inicio, Turnos.hora_fin,
@@ -27,7 +26,9 @@ LEFT JOIN Turnos ON Clase.id_turno = Turnos.id
 LEFT JOIN Alumno_Clase ON Clase.id = Alumno_Clase.id_clase
 WHERE Actividades.id = ?
 GROUP BY Clase.id
-`, [id]);
+`,
+    [id]
+  );
 
   if (result.length === 0) {
     return null;
@@ -65,11 +66,24 @@ GROUP BY Clase.id
 };
 
 const editActivity = async ({ id, descripcion, costo }) => {
-  await connection
-    .promise()
-    .query('UPDATE `Actividades` SET `descripcion` = ?, `costo` = ? WHERE `id` = ?', [descripcion, costo, id]);
+  try {
+    await connection
+      .promise()
+      .query(
+        "UPDATE `Actividades` SET `descripcion` = ?, `costo` = ? WHERE `id` = ?",
+        [descripcion, costo, id]
+      );
 
-  return getActivitiesById({ id });
+    return getActivitiesById({ id });
+  } catch (error) {
+    console.error("Error al actualizar actividad:", error.message);
+
+    if (error.errno === 1644) {
+      throw new Error(error.sqlMessage);
+    }
+
+    throw new Error("Error interno al actualizar actividad.");
+  }
 };
 
 export { getActivities, getActivitiesById, editActivity };

@@ -104,6 +104,122 @@ const createTablesQuery = `
   LEFT JOIN Clase c ON t.id = c.id_turno AND c.dictada = TRUE
   GROUP BY t.id, t.hora_inicio, t.hora_fin
   ORDER BY total_clases_dictadas DESC;
+
+  -- Trigger de Instructores
+  CREATE TRIGGER before_instructor_insert
+  BEFORE INSERT ON Instructores
+  FOR EACH ROW
+  BEGIN
+    IF EXISTS (SELECT 1 FROM Instructores WHERE ci = NEW.ci) THEN
+      SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'El instructor con esta cédula ya existe.';
+    END IF;
+  END;
+
+  CREATE TRIGGER before_instructor_update
+  BEFORE UPDATE ON Instructores
+  FOR EACH ROW
+  BEGIN
+    IF EXISTS (SELECT 1 FROM Instructores WHERE ci = NEW.ci AND ci != OLD.ci) THEN
+      SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'El instructor con esta cédula ya existe.';
+    END IF;
+  END;
+
+  -- Trigger de Turnos
+  CREATE TRIGGER before_turno_update
+  BEFORE UPDATE ON Turnos
+  FOR EACH ROW
+  BEGIN
+    IF EXISTS (SELECT 1 FROM Turnos WHERE id = NEW.id AND id != OLD.id) THEN
+      SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'El turno con este id ya existe.';
+    END IF;
+  END;
+
+  -- Trigger de Actividades
+  CREATE TRIGGER before_actividad_insert
+  BEFORE INSERT ON Actividades
+  FOR EACH ROW
+  BEGIN
+    IF EXISTS (SELECT 1 FROM Actividades WHERE id = NEW.id) THEN
+      SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'La actividad con este id ya existe.';
+    END IF;
+  END;
+
+  CREATE TRIGGER before_actividad_update
+  BEFORE UPDATE ON Actividades
+  FOR EACH ROW
+  BEGIN
+    IF EXISTS (SELECT 1 FROM Actividades WHERE id = NEW.id AND id != OLD.id) THEN
+      SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'La actividad con este id ya existe.';
+    END IF;
+  END;
+
+  -- Trigger de Equipamiento
+  --CREATE TRIGGER before_equipamiento_insert
+  --BEFORE INSERT ON Equipamiento
+  --FOR EACH ROW
+  --BEGIN
+  --  IF EXISTS (SELECT 1 FROM Equipamiento WHERE id = NEW.id) THEN
+  --    SIGNAL SQLSTATE '45000'
+  --    SET MESSAGE_TEXT = 'El equipamento con este id ya existe.';
+  --  END IF;
+  --END;
+
+  --CREATE TRIGGER before_equipamiento_update
+  --BEFORE UPDATE ON Equipamiento
+  --FOR EACH ROW
+  --BEGIN
+  --  IF EXISTS (SELECT 1 FROM Equipamiento WHERE id = NEW.id AND id != OLD.id) THEN
+  --    SIGNAL SQLSTATE '45000'
+  --    SET MESSAGE_TEXT = 'El equipamento con este id ya existe.';
+  --  END IF;
+  --END;
+
+  -- Trigger de Alumnos
+  CREATE TRIGGER before_alumno_insert
+  BEFORE INSERT ON Alumnos
+  FOR EACH ROW
+  BEGIN
+    IF EXISTS (SELECT 1 FROM Alumnos WHERE id = NEW.id) THEN
+      SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'El alumno con este id ya existe.';
+    END IF;
+  END;
+
+  CREATE TRIGGER before_alumno_update
+  BEFORE UPDATE ON Alumnos
+  FOR EACH ROW
+  BEGIN
+    IF EXISTS (SELECT 1 FROM Alumnos WHERE id = NEW.id AND id != OLD.id) THEN
+      SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'El alumno con este id ya existe.';
+    END IF;
+  END;
+
+  -- Trigger de Clase
+  CREATE TRIGGER before_clase_insert
+  BEFORE INSERT ON Clase
+  FOR EACH ROW
+  BEGIN
+    IF EXISTS (SELECT 1 FROM Clase WHERE id = NEW.id) THEN
+      SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'La clase con este id ya existe.';
+    END IF;
+  END;
+
+  CREATE TRIGGER before_clase_update
+  BEFORE UPDATE ON Clase
+  FOR EACH ROW
+  BEGIN
+    IF EXISTS (SELECT 1 FROM Clase WHERE id = NEW.id AND id != OLD.id) THEN
+      SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'La clase con este id ya existe.';
+    END IF;
+  END;
 `;
 
 const queries = createTablesQuery

@@ -1,7 +1,9 @@
-import connection from '../db/connection.js';
+import connection from "../db/connection.js";
 
 const getTurns = async () => {
-  const [result] = await connection.promise().query('SELECT * FROM `Turnos` order by hora_inicio');
+  const [result] = await connection
+    .promise()
+    .query("SELECT * FROM `Turnos` order by hora_inicio");
 
   const formattedResult = result.map((row) => ({
     id: row.id,
@@ -15,7 +17,7 @@ const getTurns = async () => {
 const getTurnById = async ({ id }) => {
   const [result] = await connection
     .promise()
-    .query('SELECT * FROM `Turnos` WHERE `id` = ?', [id]);
+    .query("SELECT * FROM `Turnos` WHERE `id` = ?", [id]);
 
   if (result.length === 0) {
     return null;
@@ -35,11 +37,10 @@ const getTurnById = async ({ id }) => {
 const getTurnsById = async ({ id }) => {
   const [result] = await connection
     .promise()
-    .query('SELECT * FROM `Turnos` WHERE `id` = ?', [id]);
+    .query("SELECT * FROM `Turnos` WHERE `id` = ?", [id]);
 
-  const [classes] = await connection
-    .promise()
-    .query(`SELECT Clase.id AS clase_id, Clase.ci_instructor, Clase.id_actividad, Clase.id_turno, Clase.dictada, Clase.dia_para_dictar,
+  const [classes] = await connection.promise().query(
+    `SELECT Clase.id AS clase_id, Clase.ci_instructor, Clase.id_actividad, Clase.id_turno, Clase.dictada, Clase.dia_para_dictar,
       Instructores.nombre AS instructor_nombre, Instructores.apellido AS instructor_apellido,
       Actividades.descripcion AS actividad_descripcion,
       Turnos.hora_inicio, Turnos.hora_fin,
@@ -51,7 +52,9 @@ LEFT JOIN Turnos ON Clase.id_turno = Turnos.id
 LEFT JOIN Alumno_Clase ON Clase.id = Alumno_Clase.id_clase
 WHERE Clase.id_turno = ?
 GROUP BY Clase.id
-`, [id]);
+`,
+    [id]
+  );
 
   if (result.length === 0) {
     return null;
@@ -92,16 +95,20 @@ const createTurn = async ({ horaInicio, horaFin }) => {
   try {
     const [result] = await connection
       .promise()
-      .query(
-        'INSERT INTO `Turnos` (`hora_inicio`, `hora_fin`) VALUES (?, ?)',
-        [horaInicio, horaFin]
-      );
+      .query("INSERT INTO `Turnos` (`hora_inicio`, `hora_fin`) VALUES (?, ?)", [
+        horaInicio,
+        horaFin,
+      ]);
 
     return getTurnById({ id: result.insertId });
   } catch (error) {
-    return {
-      error: error.message,
-    };
+    console.error("Error al crear turno:", error.message);
+
+    if (error.errno === 1644) {
+      throw new Error(error.sqlMessage);
+    }
+
+    throw new Error("Error interno al crear turno.");
   }
 };
 
@@ -110,26 +117,27 @@ const updateTurn = async ({ id, horaInicio, horaFin }) => {
     await connection
       .promise()
       .query(
-        'UPDATE `Turnos` SET `hora_inicio` = ?, `hora_fin` = ? WHERE `id` = ?',
+        "UPDATE `Turnos` SET `hora_inicio` = ?, `hora_fin` = ? WHERE `id` = ?",
         [horaInicio, horaFin, id]
       );
 
     return getTurnsById({ id });
   } catch (error) {
-    return {
-      error: error.message,
-    };
+    console.error("Error al actualizar turno:", error.message);
+
+    if (error.errno === 1644) {
+      throw new Error(error.sqlMessage);
+    }
+
+    throw new Error("Error interno al actualizar turno.");
   }
 };
 
 const deleteTurn = async (id) => {
   try {
     return await connection
-    .promise()
-    .query(
-      'DELETE FROM `Turnos` WHERE `id` = ?',
-      [id]
-    );
+      .promise()
+      .query("DELETE FROM `Turnos` WHERE `id` = ?", [id]);
   } catch (error) {
     return {
       error: error.message,

@@ -8,6 +8,7 @@ Este proyecto es una aplicación de gestión de una escuela de deportes.
 
 - Node.js
 - npm
+- MySQL
 
 ## Instalación
 

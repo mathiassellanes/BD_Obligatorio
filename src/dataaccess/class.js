@@ -1,8 +1,10 @@
 import connection from '../db/connection.js';
 import { getAge } from '../helpers/dateIsValid.js';
+import { updateClasses } from '../helpers/setClassesAsDicted.js';
 import { getActivitiesById } from './activity.js';
 import { getEquipementByIdAndActivityId } from './equipement.js';
 import { getStudentByCi } from './student.js';
+
 const baseQuery = `
 SELECT Clase.id, Clase.ci_instructor, Clase.id_actividad, Clase.id_turno, Clase.dictada, Clase.dia_para_dictar,
        Instructores.nombre, Instructores.apellido,
@@ -46,7 +48,9 @@ const getClass = async () => {
       cantidadAlumnos: row.cantidadAlumnos,
     }));
 
-    return formattedResult;
+    const updatedClasses = updateClasses(formattedResult);
+
+    return updatedClasses;
   } catch (error) {
     return {
       error: error.message,
@@ -110,7 +114,9 @@ WHERE Clase.id = ?`, [id]);
     alumnos,
   };
 
-  return classInfo;
+  const updatedClasses = updateClasses(classInfo);
+
+  return updatedClasses;
 };
 
 const createClass = async ({ ciInstructor, idActividad, idTurno, diaParaDictar, alumnos }) => {
